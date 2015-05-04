@@ -36,7 +36,7 @@
           {{ if Volt.user._is_speaker == true }}
             <form e-submit="send_message" role="form">
               <div class="form-group">
-                <input class="form-control" type="text" placeholder="Write a message" value="{{ page._new_message }}" />
+                <input class="form-control" type="text" placeholder="Please try to express your opinion clearly" value="{{ page._new_message }}" />
                 <button type="submit" class="btn btn-primary pull-right">Send</button>
               </div>
             </form>
@@ -56,7 +56,7 @@
                 {{ if Volt.user._go_ahead == true }}
                   <form e-submit="send_message" role="form">
                     <div class="form-group">
-                      <input class="form-control" type="text" placeholder="Write a message" value="{{ page._new_message }}" />
+                      <input class="form-control" type="text" placeholder="Please try to express what they are saying in your own words" value="{{ page._new_message }}" />
                       <button type="submit" class="btn btn-primary pull-right">Send</button>
                     </div>
                   </form>
