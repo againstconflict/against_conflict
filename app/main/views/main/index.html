@@ -33,13 +33,21 @@
             <div class="clearfix"></div>
           {{ end }}
  
-          <form e-submit="send_message" role="form">
-            <div class="form-group">
-              <input class="form-control" type="text" placeholder="Write a message" value="{{ page._new_message }}" />
-              <button type="submit" class="btn btn-primary pull-right">Submit</button>
-            </div>
- 
-          </form>
+          {{ if Volt.user._is_speaker == true }}
+            <form e-submit="send_message" role="form">
+              <div class="form-group">
+                <input class="form-control" type="text" placeholder="Write a message" value="{{ page._new_message }}" />
+                <button type="submit" class="btn btn-primary pull-right">Submit</button>
+              </div>
+            </form>
+            {{ _users.each do |user| }}
+              {{ if user._id == params._user_id }}
+                <button type="button" e-click="i_feel_understood(user)" class="btn btn-success">I feel understood!</button>
+              {{ end }}
+            {{ end }}
+
+          {{ end }}
+
         </div>
       {{ end }}
     </div>

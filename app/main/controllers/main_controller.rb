@@ -25,8 +25,17 @@ class MainController < Volt::ModelController
       end
     end
     page._new_message = ''
+    # unless Volt.user._is_speaker == false
+      Volt.user._is_speaker = true
+      user._is_speaker = false
+    # end
   end
- 
+
+  def i_feel_understood(user)
+    Volt.user._is_speaker = false
+    user._is_speaker = true
+  end
+
   def unread_notifications_from(user)
     _notifications.find({ sender_id: user._id, receiver_id: Volt.user._id })
   end
