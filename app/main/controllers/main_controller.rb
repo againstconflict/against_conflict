@@ -5,6 +5,10 @@ class MainController < Volt::ModelController
   def index
   end
  
+  def user_index
+    render user_index
+  end
+ 
   def send_message
     unless page._new_message.strip.empty?
       _messages << { sender_id: Volt.user._id, receiver_id: params._user_id, text: page._new_message }
@@ -53,6 +57,18 @@ class MainController < Volt::ModelController
 
   def unread_notifications_from(user)
     _notifications.find({ sender_id: user._id, receiver_id: Volt.user._id })
+  end
+ 
+  
+  # opinion stuff
+  
+  def add_opinion
+    _opinions << { user_id: Volt.user._id, name: page._new_opinion }
+    page._new_opinion = ''
+  end
+  
+  def remove_opinion(opinion)
+    _opinions.delete(opinion)
   end
  
   private

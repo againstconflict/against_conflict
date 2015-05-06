@@ -1,0 +1,25 @@
+<:Title>
+My opinions
+
+<:Body>
+  <h1>My opinions</h1>
+
+  <body>
+    <form e-submit="add_opinion" role="form">
+      <div class='form-group'>
+        <label>New opinion</label>
+        <input class="form-control" type="text" value="{{ page._new_opinion }}">
+        <button type="submit" class="btn btn-primary pull-right">Save</button>
+      </div>
+    </form>
+
+    <table class="opinion-table">
+      {{ _opinions.each do |opinion| }}
+      <tr>
+        <td>{{ opinion._name }}</td>
+        <td><button e-click="remove_opinion(opinion)" class="btn btn-primary pull-right">Delete</button></td>
+      </tr>
+      {{ end }}
+    </table>
+
+  </body>
