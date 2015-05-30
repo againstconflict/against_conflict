@@ -8,21 +8,47 @@ class MainController < Volt::ModelController
   def user_index
     render user_index
   end
- 
+
   def send_message
     unless page._new_message.strip.empty?
-      _messages << { sender_id: Volt.user._id, receiver_id: params._user_id, text: page._new_message }
+      _messages << { sender_id: Volt.user._id, receiver_id: params._user_id, opinion_id: params._opinion_id, text: page._new_message }
       _notifications << { sender_id: Volt.user._id, receiver_id: params._user_id }
       page._new_message = ''
     end
   end
- 
+
   def current_conversation
-    _messages.find({ "$or" => [{ sender_id: Volt.user._id, receiver_id: params._user_id }, { sender_id: params._user_id, receiver_id: Volt.user._id }] })
+    _messages.find({ "$or" => [{ sender_id: Volt.user._id, receiver_id: params._user_id, opinion_id: params._opinion_id }, { sender_id: params._user_id, receiver_id: Volt.user._id, opinion_id: params._opinion_id }] })
+  end
+
+  def add_conversation(user, opinion)
+    
+    # promise = _conversations.fetch
+    #
+    # promise.then do |conversations|
+    #   conversations.each do |c|
+    #     if (c._sender_id == Volt.user._id && c._receiver_id == user._id && c._opinion_id == opinion.id) || (c._sender_id == user._id && c._receiver_id == Volt.user._id && c._opinion_id == opinion.id)
+    #       _conversations << { sender_id: Volt.user._id, receiver_id: user._id, opinion_id: opinion._id }
+    #     end
+    #   end
+    # end
+    
+    # _conversations.fetch_each do |c|
+    #   if (c._sender_id == Volt.user._id && c._receiver_id == user._id && c._opinion_id == opinion.id) || (c._sender_id == user._id && c._receiver_id == Volt.user._id && c._opinion_id == opinion.id)
+    #     _conversations << { sender_id: Volt.user._id, receiver_id: user._id, opinion_id: opinion._id }
+    #   end
+    # end
+    # if _conversations.find({ "$or" => [{ sender_id: Volt.user._id, receiver_id: user._id, opinion_id: opinion._id }, { sender_id: user._id, receiver_id: Volt.user._id, opinion_id: opinion._id }] }).count == 0
+    _conversations << { sender_id: Volt.user._id, receiver_id: user._id, opinion_id: opinion._id }
+  end
+  
+  def my_conversations
+    _conversations.find({ "$or" => [{ sender_id: Volt.user._id }, { receiver_id: Volt.user._id }] })
   end
  
-  def select_conversation(user)
+  def select_conversation(user, opinion)
     params._user_id = user._id
+    params._opinion_id = opinion._id
     unread_notifications_from(user).then do |results|
       results.each do |notification|
         _notifications.delete(notification)
@@ -38,21 +64,21 @@ class MainController < Volt::ModelController
   def i_feel_understood(user)
     Volt.user._is_speaker = false
     user._is_speaker = true
-    _messages << { sender_id: Volt.user._id, receiver_id: params._user_id, text: "I feel you understand me! Please now share your point of view and I will listen." }
+    _messages << { sender_id: Volt.user._id, receiver_id: params._user_id, opinion_id: params._opinion_id, text: "I feel you understand me! Please now share your point of view and I will listen." }
   end
 
   def go_ahead(user)
     user._go_ahead = true
-    _messages << { sender_id: Volt.user._id, receiver_id: params._user_id, text: "Please go ahead." }
+    _messages << { sender_id: Volt.user._id, receiver_id: params._user_id, opinion_id: params._opinion_id, text: "Please go ahead." }
   end
   
   def not_quite(user)
     user._go_ahead = false
-    _messages << { sender_id: Volt.user._id, receiver_id: params._user_id, text: 'Not quite, let me elaborate.' }
+    _messages << { sender_id: Volt.user._id, receiver_id: params._user_id, opinion_id: params._opinion_id, text: 'Not quite, let me elaborate.' }
   end
 
   def i_think_i_understand(user)
-    _messages << { sender_id: Volt.user._id, receiver_id: params._user_id, text: 'I think I understand.' }
+    _messages << { sender_id: Volt.user._id, receiver_id: params._user_id, opinion_id: params._opinion_id, text: 'I think I understand.' }
   end
 
   def unread_notifications_from(user)
@@ -63,8 +89,24 @@ class MainController < Volt::ModelController
   # opinion stuff
   
   def add_opinion
-    _opinions << { user_id: Volt.user._id, name: page._new_opinion }
-    page._new_opinion = ''
+   _opinions << { user_id: Volt.user._id, name: page._new_opinion }
+   page._new_opinion = ''
+   unless page._new_opinion.strip.empty?
+     _opinions << { user_id: Volt.user._id, name: page._new_opinion }
+     page._new_opinion = ''
+   end
+  end
+
+  def my_opinions
+    _opinions.find( user_id: Volt.user._id )
+  end
+
+  def other_opinions
+   _opinions.find( user_id: { "$ne" => Volt.user._id } )
+  end
+  
+  def conversation_opinions
+    
   end
   
   def remove_opinion(opinion)
