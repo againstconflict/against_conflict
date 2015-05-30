@@ -2,7 +2,7 @@
   Home
  
 <:Body>
-  <h1>Conversations</h1>
+  <h1>Other Opinions</h1>
   {{ if Volt.user }}
     <div class="row">
       <div class="col-md-4">
@@ -10,21 +10,23 @@
           {{ if _conversations.find({ "$or" => [{ sender_id: Volt.user._id, opinion_id: opinion._id }, { receiver_id: Volt.user._id, opinion_id: opinion._id }] }).count == 0 }}
             <div>
               {{ _users.find( _id: opinion._user_id).each do |user| }}
-                <div class="contact {{ if params._user_id == user._id }} active {{ end }}" e-click="add_conversation(user, opinion)">
+                <div class="contact" e-click="add_conversation(user, opinion)">
                   {{opinion._name}}
-                  {{ if unread_notifications_from(user).count > 0 }}
-                    <span class="badge">
-                      {{ unread_notifications_from(user).count }}
-                    </span>
-                  {{ end }}
                 </div>
               {{ end }}
             </div>
           {{ end }}
         {{ end }}
+        <h1>Conversations</h1>
         {{ my_conversations.each do |conversation| }}
-          {{ _opinions.find( _id: conversation._opinion_id).each do |opinion| }}
-            {{ opinion._name }}
+          {{ if conversation._sender_id == Volt.user._id }}
+            <div class="contact {{ if params._user_id == user._id && params._opinion_id == conversation._opinion_id }} active {{ end }}" e-click="select_conversation(conversation._receiver_id, conversation._opinion_id)">
+              {{ _opinions.find_one(_id: conversation._opinion_id)._name }}
+            </div>
+          {{ else }}
+            <div class="contact {{ if params._user_id == user._id && params._opinion_id == conversation._opinion_id }} active {{ end }}" e-click="select_conversation(conversation._sender_id, conversation._opinion_id)">
+              {{ _opinions.find_one(_id: conversation._opinion_id)._name }}
+            </div>
           {{ end }}
         {{ end }}
       </div>

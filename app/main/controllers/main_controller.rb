@@ -46,7 +46,9 @@ class MainController < Volt::ModelController
     _conversations.find({ "$or" => [{ sender_id: Volt.user._id }, { receiver_id: Volt.user._id }] })
   end
  
-  def select_conversation(user, opinion)
+  def select_conversation(user_id, opinion_id)
+    user = _users.find_one( _id: user_id )
+    opinion = _opinions.find_one( _id: opinion_id )
     params._user_id = user._id
     params._opinion_id = opinion._id
     unread_notifications_from(user).then do |results|
@@ -103,10 +105,6 @@ class MainController < Volt::ModelController
 
   def other_opinions
    _opinions.find( user_id: { "$ne" => Volt.user._id } )
-  end
-  
-  def conversation_opinions
-    
   end
   
   def remove_opinion(opinion)
