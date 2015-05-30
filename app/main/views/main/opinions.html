@@ -14,12 +14,11 @@ My opinions
     </form>
 
     <table class="opinion-table">
-      {{ my_opinions.each do |opinion| }}
-          <tr>
-            <td>{{ opinion._name }}</td>
-            <td>{{ opinion.user_id }}</td>
-            <td><button e-click="remove_opinion(opinion)" class="btn btn-primary pull-right">Delete</button></td>
-          </tr>
+      {{ _opinions.each do |opinion| }}
+      <tr>
+        <td>{{ opinion._name }}</td>
+        <td><button e-click="remove_opinion(opinion)" class="btn btn-primary pull-right">Delete</button></td>
+      </tr>
       {{ end }}
     </table>
 

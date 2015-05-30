@@ -63,18 +63,8 @@ class MainController < Volt::ModelController
   # opinion stuff
   
   def add_opinion
-    unless page._new_opinion.strip.empty?
-      _opinions << { user_id: Volt.user._id, name: page._new_opinion }
-      page._new_opinion = ''
-    end
-  end
-  
-  def my_opinions
-    _opinions.find( user_id: Volt.user._id )
-  end
-  
-  def other_opinions
-    _opinions.find( user_id: { "$ne" => Volt.user._id } )
+    _opinions << { user_id: Volt.user._id, name: page._new_opinion }
+    page._new_opinion = ''
   end
   
   def remove_opinion(opinion)
