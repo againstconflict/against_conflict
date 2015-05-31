@@ -5,22 +5,28 @@ My opinions
   <h1>My Beliefs</h1>
 
   <body>
-    <form e-submit="add_opinion" role="form">
-      <div class='form-group'>
-        <label>New belief (50 characters max)</label>
-        <input class="form-control" type="text" value="{{ page._new_opinion }}" maxlength ="50">
-        <button type="submit" class="btn btn-primary pull-right">Save</button>
-      </div>
-    </form>
-
-    <table class="opinion-table">
-      {{ my_opinions.each do |opinion| }}
-          <tr>
-            <td>{{ opinion._name }}</td>
-            <td>{{ opinion.user_id }}</td>
-            <td><button e-click="remove_opinion(opinion)" class="btn btn-primary pull-right">Delete</button></td>
-          </tr>
-      {{ end }}
-    </table>
-
+    <div class="row">
+      <form e-submit="add_opinion" role="form">
+        <div class='form-group'>
+          <div class="col-xs-7">
+            <label>New belief (50 characters max)</label>
+            <input class="form-control" type="text" value="{{ page._new_opinion }}" maxlength ="50">
+          </div>
+        </div>
+      </form>
+    </div>
+    <br/>
+    <div class="row">
+      <table class="table">
+        <tr>
+          <th>Opinion</th>
+        </tr>
+        {{ my_opinions.each do |opinion| }}
+            <tr>
+              <td>{{ opinion._name }}</td>
+              <td><button e-click="remove_opinion(opinion)" class="btn btn-primary pull-right">Delete</button></td>
+            </tr>
+        {{ end }}
+      </table>
+    </div>
   </body>
