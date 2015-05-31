@@ -45,10 +45,20 @@
     </div>
       {{ if params._user_id }}
         <div class="col-md-8 well conversation">
+          <h3>{{ _opinions.find_one(_id: this_conversation._opinion_id)._name }}</h3>
+          {{ if this_conversation._speaker_id == Volt.user._id }}
+            <h5>You are the speaker!</h5>
+          {{ else }}
+            <h5>You are the listener!</h5>
+          {{ end }}
           <div class="scrollable-list" id="conversation-scroller"> 
             {{ current_conversation.each do |message| }}
               <div class="message {{ if message._sender_id == Volt.user._id }} sent {{ end }}">
-                <p>{{ message._text }}</p>
+                {{ if message._sender_id == Volt.user._id }} 
+                  <p>You: {{ message._text }}</p>
+                {{ else }}
+                  <p>Them: {{ message._text }}</p>
+                {{ end }}
                 {{ scroll_down }}
               </div>
             {{ end }}
