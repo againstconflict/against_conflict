@@ -47,9 +47,14 @@ class MainController < Volt::ModelController
     page._new_message = ''
   end
 
+  def scroll_down
+    %x{document.getElementById('conversation-scroller').scrollTop = document.getElementById('conversation-scroller').scrollHeight}
+    return nil
+  end
+
   def i_feel_understood(conversation, user)
     conversation._speaker_id = user._id
-    _messages << { sender_id: Volt.user._id, receiver_id: params._user_id, opinion_id: params._opinion_id, text: "I feel you understand me! Please now share your point of view and I will listen." }
+    _messages << { sender_id: Volt.user._id, receiver_id: params._user_id, opinion_id: params._opinion_id, text: "I feel you understand me! Please share your point of view and I will listen." }
   end
 
   def go_ahead(conversation, user)
@@ -59,7 +64,7 @@ class MainController < Volt::ModelController
   
   def not_quite(conversation, user)
     conversation._go_ahead_user_id = 0
-    _messages << { sender_id: Volt.user._id, receiver_id: params._user_id, opinion_id: params._opinion_id, text: 'Not quite, let me elaborate.' }
+    _messages << { sender_id: Volt.user._id, receiver_id: params._user_id, opinion_id: params._opinion_id, text: 'Not quite, let me explain.' }
   end
 
   def i_think_i_understand(user)
