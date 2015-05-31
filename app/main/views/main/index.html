@@ -11,10 +11,20 @@
             {{ if conversation._sender_id == Volt.user._id }}
               <div class="contact {{ if params._user_id == conversation._receiver_id && params._opinion_id == conversation._opinion_id }} active {{ end }}" e-click="select_conversation(conversation._receiver_id, conversation._opinion_id)">
                 {{ _opinions.find_one(_id: conversation._opinion_id)._name }}
+                {{ if unread_notifications_from(conversation._receiver_id, conversation._opinion_id).count > 0 }}
+                  <span class="badge">
+                    {{ unread_notifications_from(conversation._receiver_id, conversation._opinion_id).count }}
+                  </span>
+                {{ end }}
               </div>
             {{ else }}
               <div class="contact {{ if params._user_id == conversation._sender_id && params._opinion_id == conversation._opinion_id }} active {{ end }}" e-click="select_conversation(conversation._sender_id, conversation._opinion_id)">
                 {{ _opinions.find_one(_id: conversation._opinion_id)._name }}
+                {{ if unread_notifications_from(conversation._sender_id, conversation._opinion_id).count > 0 }}
+                  <span class="badge">
+                    {{ unread_notifications_from(conversation._sender_id, conversation._opinion_id).count }}
+                  </span>
+                {{ end }}
               </div>
             {{ end }}
           {{ end }}
@@ -43,68 +53,69 @@
         <div>Nothing at the moment!</div>
       {{ end }}
     </div>
-      {{ if params._user_id }}
-        <div class="col-md-8 well conversation">
-          <h3>{{ _opinions.find_one(_id: this_conversation._opinion_id)._name }}</h3>
-          {{ if this_conversation._speaker_id == Volt.user._id }}
-            <h5>You are the speaker!</h5>
-          {{ else }}
-            <h5>You are the listener!</h5>
-          {{ end }}
-          <div class="scrollable-list" id="conversation-scroller"> 
-            {{ current_conversation.each do |message| }}
-              <div class="message {{ if message._sender_id == Volt.user._id }} sent {{ end }}">
-                {{ if message._sender_id == Volt.user._id }} 
-                  <p>You: {{ message._text }}</p>
-                {{ else }}
-                  <p>Them: {{ message._text }}</p>
-                {{ end }}
-                {{ scroll_down }}
-              </div>
-            {{ end }}
-          </div>
-          {{ if current_conversation.count == 0 }}
-            <p>You have no messages yet. Start chatting!</p>
-          {{ else }}
-            <div class="clearfix"></div>
-          {{ end }}
- 
-          {{ if this_conversation._speaker_id == Volt.user._id }}
-            <form e-submit="send_message" role="form">
-              <div class="form-group">
-                <input class="form-control" type="text" placeholder="Please try to express your opinion clearly" value="{{ page._new_message }}" />
-                <button type="submit" class="btn btn-primary pull-right">Send</button>
-              </div>
-            </form>
-            {{ _users.each do |user| }}
-              {{ if user._id == params._user_id }}
-                {{ if this_conversation._go_ahead_user_id == 0 || this_conversation._go_ahead_user_id == nil }}
-                  <button type="button" e-click="go_ahead(this_conversation, user)" class="btn btn-warning">Go ahead</button>
-                {{ elsif this_conversation._go_ahead_user_id == user._id }}
-                  <button type="button" e-click="not_quite(this_conversation, user)" class="btn btn-danger">Not quite</button>
-                {{ end }}
-                <button type="button" e-click="i_feel_understood(this_conversation,user)" class="btn btn-success">I feel understood!</button>
+    
+    {{ if params._user_id }}
+      <div class="col-md-8 well conversation">
+        <h3>{{ _opinions.find_one(_id: this_conversation._opinion_id)._name }}</h3>
+        {{ if this_conversation._speaker_id == Volt.user._id }}
+          <h5>You are the speaker!</h5>
+        {{ else }}
+          <h5>You are the listener!</h5>
+        {{ end }}
+        <div class="scrollable-list" id="conversation-scroller"> 
+          {{ current_conversation.each do |message| }}
+            <div class="message {{ if message._sender_id == Volt.user._id }} sent {{ end }}">
+              {{ if message._sender_id == Volt.user._id }} 
+                <p>You: {{ message._text }}</p>
+              {{ else }}
+                <p>Them: {{ message._text }}</p>
               {{ end }}
-            {{ end }}
-          {{ else }}
-            {{ _users.each do |user| }}
-              {{ if user._id == params._user_id }}
-                {{ if this_conversation._go_ahead_user_id == Volt.user._id }}
-                  <form e-submit="send_message" role="form">
-                    <div class="form-group">
-                      <input class="form-control" type="text" placeholder="Please try to express what they are saying in your own words" value="{{ page._new_message }}" />
-                      <button type="submit" class="btn btn-primary pull-right">Send</button>
-                    </div>
-                  </form>
-                {{ else }}
-                  <button type="button" e-click="i_think_i_understand(user)" class="btn btn-warning">I think I understand</button>
-                {{ end }}
-              {{ end }}
-            {{ end }}
+              {{ scroll_down }}
+            </div>
           {{ end }}
         </div>
-      {{ end }}
-    </div>
-  {{ else }}
-    <p>This is a chat application built with Volt to demonstrate its real-time capabilities. Please log in to access it.</p>
-  {{ end }}
+        {{ if current_conversation.count == 0 }}
+          <p>You have no messages yet. Start chatting!</p>
+        {{ else }}
+          <div class="clearfix"></div>
+        {{ end }}
+
+        {{ if this_conversation._speaker_id == Volt.user._id }}
+          <form e-submit="send_message" role="form">
+            <div class="form-group">
+              <input class="form-control" type="text" placeholder="Try to express your opinion clearly" value="{{ page._new_message }}" />
+              <button type="submit" class="btn btn-primary pull-right">Send</button>
+            </div>
+          </form>
+          {{ _users.each do |user| }}
+            {{ if user._id == params._user_id }}
+              {{ if this_conversation._go_ahead_user_id == 0 || this_conversation._go_ahead_user_id == nil }}
+                <button type="button" e-click="go_ahead(this_conversation, user)" class="btn btn-warning">Go ahead</button>
+              {{ elsif this_conversation._go_ahead_user_id == user._id }}
+                <button type="button" e-click="not_quite(this_conversation, user)" class="btn btn-danger">Not quite</button>
+              {{ end }}
+              <button type="button" e-click="i_feel_understood(this_conversation,user)" class="btn btn-success">I feel understood!</button>
+            {{ end }}
+          {{ end }}
+        {{ else }}
+          {{ _users.each do |user| }}
+            {{ if user._id == params._user_id }}
+              {{ if this_conversation._go_ahead_user_id == Volt.user._id }}
+                <form e-submit="send_message" role="form">
+                  <div class="form-group">
+                    <input class="form-control" type="text" placeholder="Try to express what they are saying in your own words" value="{{ page._new_message }}" />
+                    <button type="submit" class="btn btn-primary pull-right">Send</button>
+                  </div>
+                </form>
+              {{ else }}
+                <button type="button" e-click="i_think_i_understand(this_conversation, user)" class="btn btn-warning">I think I understand</button>
+              {{ end }}
+            {{ end }}
+          {{ end }}
+        {{ end }}
+      </div>
+    {{ end }}
+  </div>
+{{ else }}
+  <p>This is a chat application built with Volt to demonstrate its real-time capabilities. Please log in to access it.</p>
+{{ end }}

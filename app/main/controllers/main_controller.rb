@@ -12,7 +12,7 @@ class MainController < Volt::ModelController
   def send_message
     unless page._new_message.strip.empty?
       _messages << { sender_id: Volt.user._id, receiver_id: params._user_id, opinion_id: params._opinion_id, text: page._new_message }
-      _notifications << { sender_id: Volt.user._id, receiver_id: params._user_id }
+      _notifications << { sender_id: Volt.user._id, receiver_id: params._user_id, opinion_id: params._opinion_id }
       page._new_message = ''
     end
   end
@@ -27,7 +27,8 @@ class MainController < Volt::ModelController
 
   def add_conversation(user, opinion)
     _conversations << { sender_id: Volt.user._id, receiver_id: user._id, opinion_id: opinion._id, speaker_id: user._id }
-    _messages << { sender_id: Volt.user._id, receiver_id: user._id, opinion_id: opinion._id, text: "I want to understand this! Please share your point of view and I will listen." }
+    _messages << { sender_id: Volt.user._id, receiver_id: user._id, opinion_id: opinion._id, text: "I want to understand this!" }
+    _notifications << { sender_id: Volt.user._id, receiver_id: user._id, opinion_id: opinion._id }
   end
   
   def my_conversations
@@ -39,7 +40,7 @@ class MainController < Volt::ModelController
     opinion = _opinions.find_one( _id: opinion_id )
     params._user_id = user._id
     params._opinion_id = opinion._id
-    unread_notifications_from(user).then do |results|
+    unread_notifications_from(user_id, opinion_id).then do |results|
       results.each do |notification|
         _notifications.delete(notification)
       end
@@ -54,25 +55,29 @@ class MainController < Volt::ModelController
 
   def i_feel_understood(conversation, user)
     conversation._speaker_id = user._id
-    _messages << { sender_id: Volt.user._id, receiver_id: params._user_id, opinion_id: params._opinion_id, text: "I feel you understand me! Please share your point of view and I will listen." }
+    _messages << { sender_id: Volt.user._id, receiver_id: params._user_id, opinion_id: params._opinion_id, text: "I feel you understand me! Your turn." }
+    _notifications << { sender_id: Volt.user._id, receiver_id: user._id, opinion_id: conversation._opinion_id }
   end
 
   def go_ahead(conversation, user)
     conversation._go_ahead_user_id = user._id
     _messages << { sender_id: Volt.user._id, receiver_id: params._user_id, opinion_id: params._opinion_id, text: "Please go ahead." }
+    _notifications << { sender_id: Volt.user._id, receiver_id: user._id, opinion_id: conversation._opinion_id }
   end
   
   def not_quite(conversation, user)
     conversation._go_ahead_user_id = 0
     _messages << { sender_id: Volt.user._id, receiver_id: params._user_id, opinion_id: params._opinion_id, text: 'Not quite, let me explain.' }
+    _notifications << { sender_id: Volt.user._id, receiver_id: user._id, opinion_id: conversation._opinion_id }
   end
 
-  def i_think_i_understand(user)
+  def i_think_i_understand(conversation, user)
     _messages << { sender_id: Volt.user._id, receiver_id: params._user_id, opinion_id: params._opinion_id, text: 'I think I understand.' }
+    _notifications << { sender_id: Volt.user._id, receiver_id: user._id, opinion_id: conversation._opinion_id }
   end
 
-  def unread_notifications_from(user)
-    _notifications.find({ sender_id: user._id, receiver_id: Volt.user._id })
+  def unread_notifications_from(user_id, opinion_id)
+    _notifications.find({ sender_id: user_id, receiver_id: Volt.user._id, opinion_id: opinion_id })
   end
  
   
