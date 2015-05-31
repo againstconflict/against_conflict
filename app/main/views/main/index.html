@@ -83,7 +83,7 @@
         {{ if this_conversation._speaker_id == Volt.user._id }}
           <form e-submit="send_message" role="form">
             <div class="form-group">
-              <input class="form-control" type="text" placeholder="Try to express your opinion clearly" value="{{ page._new_message }}" />
+              <input class="form-control" type="text" placeholder="You are the speaker: try to express your point of view clearly" value="{{ page._new_message }}" />
               <button type="submit" class="btn btn-primary pull-right">Send</button>
             </div>
           </form>
@@ -103,7 +103,7 @@
               {{ if this_conversation._go_ahead_user_id == Volt.user._id }}
                 <form e-submit="send_message" role="form">
                   <div class="form-group">
-                    <input class="form-control" type="text" placeholder="Try to express what they are saying in your own words" value="{{ page._new_message }}" />
+                    <input class="form-control" type="text" placeholder="You are the listener: try to express their point of view clearly" value="{{ page._new_message }}" />
                     <button type="submit" class="btn btn-primary pull-right">Send</button>
                   </div>
                 </form>
