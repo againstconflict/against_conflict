@@ -6,7 +6,7 @@
     <div class="header">
       <ul class="nav nav-pills pull-right">
         <:nav href="/" text="Chat" />
-        <:nav href="/opinions" text="My Opinions" />
+        <:nav href="/opinions" text="My Beliefs" />
         <:user-templates:menu />
       </ul>
       <h3 class="text-muted">Against Conflict</h3>
@@ -16,12 +16,12 @@
  
     {{ template main_path, 'body', {controller_group: 'main'} }}
  
-    <div class="footer">
-      <p>&copy; Alex Rudall 2015 - want to support me? Check out my scifi novel :)</p>
-    </div>
+
  
   </div>
- 
+
+
+
 <:Nav>
   <li class="{{ if active_tab? }}active{{ end }}">
     <a href="{{ attrs.href }}">{{ attrs.text }}</a>

@@ -2,13 +2,13 @@
 My opinions
 
 <:Body>
-  <h1>My opinions</h1>
+  <h1>My Beliefs</h1>
 
   <body>
     <form e-submit="add_opinion" role="form">
       <div class='form-group'>
-        <label>New opinion</label>
-        <input class="form-control" type="text" value="{{ page._new_opinion }}">
+        <label>New belief (25 characters max)</label>
+        <input class="form-control" type="text" value="{{ page._new_opinion }}" maxlength ="25">
         <button type="submit" class="btn btn-primary pull-right">Save</button>
       </div>
     </form>
