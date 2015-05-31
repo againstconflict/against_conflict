@@ -21,25 +21,13 @@ class MainController < Volt::ModelController
     _messages.find({ "$or" => [{ sender_id: Volt.user._id, receiver_id: params._user_id, opinion_id: params._opinion_id }, { sender_id: params._user_id, receiver_id: Volt.user._id, opinion_id: params._opinion_id }] })
   end
 
+  def this_conversation
+    _conversations.find_one({ "$or" => [{ sender_id: Volt.user._id, receiver_id: params._user_id, opinion_id: params._opinion_id }, { sender_id: params._user_id, receiver_id: Volt.user._id, opinion_id: params._opinion_id }] })
+  end
+
   def add_conversation(user, opinion)
-    
-    # promise = _conversations.fetch
-    #
-    # promise.then do |conversations|
-    #   conversations.each do |c|
-    #     if (c._sender_id == Volt.user._id && c._receiver_id == user._id && c._opinion_id == opinion.id) || (c._sender_id == user._id && c._receiver_id == Volt.user._id && c._opinion_id == opinion.id)
-    #       _conversations << { sender_id: Volt.user._id, receiver_id: user._id, opinion_id: opinion._id }
-    #     end
-    #   end
-    # end
-    
-    # _conversations.fetch_each do |c|
-    #   if (c._sender_id == Volt.user._id && c._receiver_id == user._id && c._opinion_id == opinion.id) || (c._sender_id == user._id && c._receiver_id == Volt.user._id && c._opinion_id == opinion.id)
-    #     _conversations << { sender_id: Volt.user._id, receiver_id: user._id, opinion_id: opinion._id }
-    #   end
-    # end
-    # if _conversations.find({ "$or" => [{ sender_id: Volt.user._id, receiver_id: user._id, opinion_id: opinion._id }, { sender_id: user._id, receiver_id: Volt.user._id, opinion_id: opinion._id }] }).count == 0
-    _conversations << { sender_id: Volt.user._id, receiver_id: user._id, opinion_id: opinion._id }
+    _conversations << { sender_id: Volt.user._id, receiver_id: user._id, opinion_id: opinion._id, speaker_id: user._id }
+    _messages << { sender_id: Volt.user._id, receiver_id: user._id, opinion_id: opinion._id, text: "I want to understand this! Please share your point of view and I will listen." }
   end
   
   def my_conversations
@@ -57,25 +45,20 @@ class MainController < Volt::ModelController
       end
     end
     page._new_message = ''
-    unless Volt.user._is_speaker == false
-      Volt.user._is_speaker = true
-      user._is_speaker = false
-    end
   end
 
-  def i_feel_understood(user)
-    Volt.user._is_speaker = false
-    user._is_speaker = true
+  def i_feel_understood(conversation, user)
+    conversation._speaker_id = user._id
     _messages << { sender_id: Volt.user._id, receiver_id: params._user_id, opinion_id: params._opinion_id, text: "I feel you understand me! Please now share your point of view and I will listen." }
   end
 
-  def go_ahead(user)
-    user._go_ahead = true
+  def go_ahead(conversation, user)
+    conversation._go_ahead_user_id = user._id
     _messages << { sender_id: Volt.user._id, receiver_id: params._user_id, opinion_id: params._opinion_id, text: "Please go ahead." }
   end
   
-  def not_quite(user)
-    user._go_ahead = false
+  def not_quite(conversation, user)
+    conversation._go_ahead_user_id = 0
     _messages << { sender_id: Volt.user._id, receiver_id: params._user_id, opinion_id: params._opinion_id, text: 'Not quite, let me elaborate.' }
   end
 

@@ -5,35 +5,43 @@
   {{ if Volt.user }}
   <h2>Conversations</h2>
     <div class="col-md-4">
-      <div class="scrollable-list">
-        {{ my_conversations.each do |conversation| }}
-          {{ if conversation._sender_id == Volt.user._id }}
-            <div class="contact {{ if params._user_id == conversation._receiver_id && params._opinion_id == conversation._opinion_id }} active {{ end }}" e-click="select_conversation(conversation._receiver_id, conversation._opinion_id)">
-              {{ _opinions.find_one(_id: conversation._opinion_id)._name }}
-            </div>
-          {{ else }}
-            <div class="contact {{ if params._user_id == conversation._sender_id && params._opinion_id == conversation._opinion_id }} active {{ end }}" e-click="select_conversation(conversation._sender_id, conversation._opinion_id)">
-              {{ _opinions.find_one(_id: conversation._opinion_id)._name }}
-            </div>
-          {{ end }}
-        {{ end }}
-      </div>
-  <h2>Beliefs</h2>
-      <div class="row">
+      {{ if my_conversations.count != 0 }}
         <div class="scrollable-list">
-          {{ other_opinions.each do |opinion| }}
-            {{ if _conversations.find({ "$or" => [{ sender_id: Volt.user._id, opinion_id: opinion._id }, { receiver_id: Volt.user._id, opinion_id: opinion._id }] }).count == 0 }}
-              <div>
-                {{ _users.find( _id: opinion._user_id).each do |user| }}
-                  <div class="contact" e-click="add_conversation(user, opinion)">
-                    {{opinion._name}}
-                  </div>
-                {{ end }}
+          {{ my_conversations.each do |conversation| }}
+            {{ if conversation._sender_id == Volt.user._id }}
+              <div class="contact {{ if params._user_id == conversation._receiver_id && params._opinion_id == conversation._opinion_id }} active {{ end }}" e-click="select_conversation(conversation._receiver_id, conversation._opinion_id)">
+                {{ _opinions.find_one(_id: conversation._opinion_id)._name }}
+              </div>
+            {{ else }}
+              <div class="contact {{ if params._user_id == conversation._sender_id && params._opinion_id == conversation._opinion_id }} active {{ end }}" e-click="select_conversation(conversation._sender_id, conversation._opinion_id)">
+                {{ _opinions.find_one(_id: conversation._opinion_id)._name }}
               </div>
             {{ end }}
           {{ end }}
         </div>
-      </div>
+      {{ else }}
+        <div>Click on a belief to learn about it and share your point of view!</div>
+      {{ end }}
+      <h2>Other people believe...</h2>
+      {{ if other_opinions.count != 0 }}
+        <div class="row">
+          <div class="scrollable-list">
+            {{ other_opinions.each do |opinion| }}
+              {{ if _conversations.find({ "$or" => [{ sender_id: Volt.user._id, opinion_id: opinion._id }, { receiver_id: Volt.user._id, opinion_id: opinion._id }] }).count == 0 }}
+                <div>
+                  {{ _users.find( _id: opinion._user_id).each do |user| }}
+                    <div class="contact" e-click="add_conversation(user, opinion)">
+                      {{opinion._name}}
+                    </div>
+                  {{ end }}
+                </div>
+              {{ end }}
+            {{ end }}
+          </div>
+        </div>
+      {{ else }}
+        <div>Nothing at the moment!</div>
+      {{ end }}
     </div>
       {{ if params._user_id }}
         <div class="col-md-8 well conversation">
@@ -49,7 +57,7 @@
             <div class="clearfix"></div>
           {{ end }}
  
-          {{ if Volt.user._is_speaker == true }}
+          {{ if this_conversation._speaker_id == Volt.user._id }}
             <form e-submit="send_message" role="form">
               <div class="form-group">
                 <input class="form-control" type="text" placeholder="Please try to express your opinion clearly" value="{{ page._new_message }}" />
@@ -58,18 +66,18 @@
             </form>
             {{ _users.each do |user| }}
               {{ if user._id == params._user_id }}
-                {{ if user._go_ahead == false }}
-                  <button type="button" e-click="go_ahead(user)" class="btn btn-warning">Go ahead</button>
-                {{ else }}
-                  <button type="button" e-click="not_quite(user)" class="btn btn-danger">Not quite</button>
+                {{ if this_conversation._go_ahead_user_id == 0 || this_conversation._go_ahead_user_id == nil }}
+                  <button type="button" e-click="go_ahead(this_conversation, user)" class="btn btn-warning">Go ahead</button>
+                {{ elsif this_conversation._go_ahead_user_id == user._id }}
+                  <button type="button" e-click="not_quite(this_conversation, user)" class="btn btn-danger">Not quite</button>
                 {{ end }}
-                <button type="button" e-click="i_feel_understood(user)" class="btn btn-success">I feel understood!</button>
+                <button type="button" e-click="i_feel_understood(this_conversation,user)" class="btn btn-success">I feel understood!</button>
               {{ end }}
             {{ end }}
           {{ else }}
             {{ _users.each do |user| }}
               {{ if user._id == params._user_id }}
-                {{ if Volt.user._go_ahead == true }}
+                {{ if this_conversation._go_ahead_user_id == Volt.user._id }}
                   <form e-submit="send_message" role="form">
                     <div class="form-group">
                       <input class="form-control" type="text" placeholder="Please try to express what they are saying in your own words" value="{{ page._new_message }}" />
