@@ -55,6 +55,7 @@ class MainController < Volt::ModelController
 
   def i_feel_understood(conversation, user)
     conversation._speaker_id = user._id
+    conversation._go_ahead_user_id = 0
     _messages << { sender_id: Volt.user._id, receiver_id: params._user_id, opinion_id: params._opinion_id, text: "I feel you understand me! Your turn." }
     _notifications << { sender_id: Volt.user._id, receiver_id: user._id, opinion_id: conversation._opinion_id }
   end

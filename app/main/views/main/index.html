@@ -3,59 +3,10 @@
  
 <:Body>
   {{ if Volt.user }}
-  <h2>Conversations</h2>
-    <div class="col-md-4">
-      {{ if my_conversations.count != 0 }}
-        <div class="scrollable-list">
-          {{ my_conversations.each do |conversation| }}
-            {{ if conversation._sender_id == Volt.user._id }}
-              <div class="contact {{ if params._user_id == conversation._receiver_id && params._opinion_id == conversation._opinion_id }} active {{ end }}" e-click="select_conversation(conversation._receiver_id, conversation._opinion_id)">
-                {{ _opinions.find_one(_id: conversation._opinion_id)._name }}
-                {{ if unread_notifications_from(conversation._receiver_id, conversation._opinion_id).count > 0 }}
-                  <span class="badge">
-                    {{ unread_notifications_from(conversation._receiver_id, conversation._opinion_id).count }}
-                  </span>
-                {{ end }}
-              </div>
-            {{ else }}
-              <div class="contact {{ if params._user_id == conversation._sender_id && params._opinion_id == conversation._opinion_id }} active {{ end }}" e-click="select_conversation(conversation._sender_id, conversation._opinion_id)">
-                {{ _opinions.find_one(_id: conversation._opinion_id)._name }}
-                {{ if unread_notifications_from(conversation._sender_id, conversation._opinion_id).count > 0 }}
-                  <span class="badge">
-                    {{ unread_notifications_from(conversation._sender_id, conversation._opinion_id).count }}
-                  </span>
-                {{ end }}
-              </div>
-            {{ end }}
-          {{ end }}
-        </div>
-      {{ else }}
-        <div>Click on a belief to learn about it and share your point of view!</div>
-      {{ end }}
-      <h2>Other people believe...</h2>
-      {{ if other_opinions.count != 0 }}
-        <div class="row">
-          <div class="scrollable-list">
-            {{ other_opinions.each do |opinion| }}
-              {{ if _conversations.find({ "$or" => [{ sender_id: Volt.user._id, opinion_id: opinion._id }, { receiver_id: Volt.user._id, opinion_id: opinion._id }] }).count == 0 }}
-                <div>
-                  {{ _users.find( _id: opinion._user_id).each do |user| }}
-                    <div class="contact" e-click="add_conversation(user, opinion)">
-                      {{opinion._name}}
-                    </div>
-                  {{ end }}
-                </div>
-              {{ end }}
-            {{ end }}
-          </div>
-        </div>
-      {{ else }}
-        <div>Nothing at the moment!</div>
-      {{ end }}
-    </div>
     
-    {{ if params._user_id }}
-      <div class="col-md-8 well conversation">
+    
+    <div class="col-md-8 col-md-push-4 well conversation">
+        {{ if params._user_id && params._opinion_id }}
         <h3>{{ _opinions.find_one(_id: this_conversation._opinion_id)._name }}</h3>
         {{ if this_conversation._speaker_id == Volt.user._id }}
           <h5>You are the speaker!</h5>
@@ -113,9 +64,60 @@
             {{ end }}
           {{ end }}
         {{ end }}
+      {{ end }}
       </div>
-    {{ end }}
-  </div>
+      
+      <div class="col-md-4 col-md-pull-8">
+        <h2>Conversations</h2>
+      
+        {{ if my_conversations.count != 0 }}
+          <div class="scrollable-list">
+            {{ my_conversations.each do |conversation| }}
+              {{ if conversation._sender_id == Volt.user._id }}
+                <div class="contact {{ if params._user_id == conversation._receiver_id && params._opinion_id == conversation._opinion_id }} active {{ end }}" e-click="select_conversation(conversation._receiver_id, conversation._opinion_id)">
+                  {{ _opinions.find_one(_id: conversation._opinion_id)._name }}
+                  {{ if unread_notifications_from(conversation._receiver_id, conversation._opinion_id).count > 0 }}
+                    <span class="badge">
+                      {{ unread_notifications_from(conversation._receiver_id, conversation._opinion_id).count }}
+                    </span>
+                  {{ end }}
+                </div>
+              {{ else }}
+                <div class="contact {{ if params._user_id == conversation._sender_id && params._opinion_id == conversation._opinion_id }} active {{ end }}" e-click="select_conversation(conversation._sender_id, conversation._opinion_id)">
+                  {{ _opinions.find_one(_id: conversation._opinion_id)._name }}
+                  {{ if unread_notifications_from(conversation._sender_id, conversation._opinion_id).count > 0 }}
+                    <span class="badge">
+                      {{ unread_notifications_from(conversation._sender_id, conversation._opinion_id).count }}
+                    </span>
+                  {{ end }}
+                </div>
+              {{ end }}
+            {{ end }}
+          </div>
+        {{ else }}
+          <div>Click on a belief to learn about it and share your point of view!</div>
+        {{ end }}
+        <h2>Other people believe...</h2>
+        {{ if other_opinions.count != 0 }}
+          <div class="row">
+            <div class="scrollable-list">
+              {{ other_opinions.each do |opinion| }}
+                {{ if _conversations.find({ "$or" => [{ sender_id: Volt.user._id, opinion_id: opinion._id }, { receiver_id: Volt.user._id, opinion_id: opinion._id }] }).count == 0 }}
+                  <div>
+                    {{ _users.find( _id: opinion._user_id).each do |user| }}
+                      <div class="contact" e-click="add_conversation(user, opinion)">
+                        {{opinion._name}}
+                      </div>
+                    {{ end }}
+                  </div>
+                {{ end }}
+              {{ end }}
+            </div>
+          </div>
+        {{ else }}
+          <div>Nothing at the moment!</div>
+        {{ end }}
+      </div>
 {{ else }}
   <p>This is a chat application built with Volt to demonstrate its real-time capabilities. Please log in to access it.</p>
 {{ end }}
