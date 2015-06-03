@@ -14,6 +14,7 @@ class MainController < Volt::ModelController
       _messages << { sender_id: Volt.user._id, receiver_id: params._user_id, opinion_id: params._opinion_id, text: page._new_message }
       _notifications << { sender_id: Volt.user._id, receiver_id: params._user_id, opinion_id: params._opinion_id }
       page._new_message = ''
+      set_online(Volt.user)
     end
   end
 
@@ -29,6 +30,7 @@ class MainController < Volt::ModelController
     _conversations << { sender_id: Volt.user._id, receiver_id: user._id, opinion_id: opinion._id, speaker_id: user._id }
     _messages << { sender_id: Volt.user._id, receiver_id: user._id, opinion_id: opinion._id, text: "I want to understand this!" }
     _notifications << { sender_id: Volt.user._id, receiver_id: user._id, opinion_id: opinion._id }
+    set_online(Volt.user)
   end
   
   def my_conversations
@@ -46,6 +48,7 @@ class MainController < Volt::ModelController
       end
     end
     page._new_message = ''
+    set_online(Volt.user)
   end
 
   def scroll_down
@@ -56,25 +59,29 @@ class MainController < Volt::ModelController
   def i_feel_understood(conversation, user)
     conversation._speaker_id = user._id
     conversation._go_ahead_user_id = 0
-    _messages << { sender_id: Volt.user._id, receiver_id: params._user_id, opinion_id: params._opinion_id, text: "I feel you understand me! Your turn." }
+    _messages << { sender_id: Volt.user._id, receiver_id: user._id, opinion_id: conversation._opinion_id, text: "I feel you understand me! Your turn." }
     _notifications << { sender_id: Volt.user._id, receiver_id: user._id, opinion_id: conversation._opinion_id }
+    set_online(Volt.user)
   end
 
   def go_ahead(conversation, user)
     conversation._go_ahead_user_id = user._id
-    _messages << { sender_id: Volt.user._id, receiver_id: params._user_id, opinion_id: params._opinion_id, text: "Please go ahead." }
+    _messages << { sender_id: Volt.user._id, receiver_id: user._id, opinion_id: conversation._opinion_id, text: "Please go ahead." }
     _notifications << { sender_id: Volt.user._id, receiver_id: user._id, opinion_id: conversation._opinion_id }
+    set_online(Volt.user)
   end
   
   def not_quite(conversation, user)
     conversation._go_ahead_user_id = 0
-    _messages << { sender_id: Volt.user._id, receiver_id: params._user_id, opinion_id: params._opinion_id, text: 'Not quite, let me explain.' }
+    _messages << { sender_id: Volt.user._id, receiver_id: user._id, opinion_id: conversation._opinion_id, text: 'Not quite, let me explain.' }
     _notifications << { sender_id: Volt.user._id, receiver_id: user._id, opinion_id: conversation._opinion_id }
+    set_online(Volt.user)
   end
 
   def i_think_i_understand(conversation, user)
-    _messages << { sender_id: Volt.user._id, receiver_id: params._user_id, opinion_id: params._opinion_id, text: 'I think I understand.' }
+    _messages << { sender_id: Volt.user._id, receiver_id: user._id, opinion_id: conversation._opinion_id, text: 'I think I understand.' }
     _notifications << { sender_id: Volt.user._id, receiver_id: user._id, opinion_id: conversation._opinion_id }
+    set_online(Volt.user)
   end
 
   def unread_notifications_from(user_id, opinion_id)
@@ -91,6 +98,7 @@ class MainController < Volt::ModelController
      _opinions << { user_id: Volt.user._id, name: page._new_opinion }
      page._new_opinion = ''
    end
+   set_online(Volt.user)
   end
 
   def my_opinions
@@ -103,6 +111,25 @@ class MainController < Volt::ModelController
   
   def remove_opinion(opinion)
     _opinions.delete(opinion)
+    set_online(Volt.user)
+  end
+  
+  # online user check
+  def check_online(user)
+    if user._last_online.to_i > Time.now.to_i - 120
+      return true
+    else
+      return false
+    end
+  end
+ 
+  def set_online(user)
+    user._last_online = Time.now.to_i
+    return nil
+  end
+  
+  def set_offline(user)
+    user._last_online = 0
   end
  
   private
