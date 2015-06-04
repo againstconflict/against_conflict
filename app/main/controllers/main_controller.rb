@@ -110,8 +110,9 @@ class MainController < Volt::ModelController
   end
   
   def remove_opinion(opinion)
-    _opinions.delete(opinion)
     set_online(Volt.user)
+    _conversations.delete(_conversations.find_one( opinion_id: opinion._id))
+    _opinions.delete(opinion)
   end
   
   # online user check
