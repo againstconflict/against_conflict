@@ -4,7 +4,8 @@ Volt.configure do |config|
   # Your app secret is used for signing things like the user cookie so it can't
   # be tampered with.  A random value is generated on new projects that will work
   # without the need to customize.  Make sure this value doesn't leave your server.
-  config.app_secret = 'G2ZmXQ_dH09BlZNU-hD4cMwp4nlDKukMFL1O_zOK_7SPkOgO-8L-EoEL8gPWNrpA0_Q'
+  
+  config.app_secret = ENV['APP_SECRET']
 
   # Database config all start with db_ and can be set either in the config
   # file or with an environment variable (DB_NAME for example).
@@ -31,7 +32,7 @@ Volt.configure do |config|
   config.db_name = (config.app_name + '_' + Volt.env.to_s)
 
   if ENV['MONGOLAB_URI'].present?
-    config.db_uri = ENV['MONGOLAB_URI'] # you will have to set this on heroku
+    config.db_uri = ENV['MONGOLAB_URI']
   else
     config.db_host = 'localhost'
     config.db_port = 27017

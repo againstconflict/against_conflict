@@ -1,5 +1,5 @@
 <:Title>
-  Home
+  Chat
  
 <:Body>
   {{ if Volt.user }}
@@ -139,5 +139,5 @@
         {{ end }}
       </div>
 {{ else }}
-  <p>Please log in or sign up!</p>
+  <:user-templates:login post-login-url="/" />
 {{ end }}
