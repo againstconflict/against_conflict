@@ -27,10 +27,10 @@ class MainController < Volt::ModelController
   end
 
   def add_conversation(user, opinion)
+    set_online(Volt.user)
     _conversations << { sender_id: Volt.user._id, receiver_id: user._id, opinion_id: opinion._id, speaker_id: user._id }
     _messages << { sender_id: Volt.user._id, receiver_id: user._id, opinion_id: opinion._id, text: "I want to understand this!" }
     _notifications << { sender_id: Volt.user._id, receiver_id: user._id, opinion_id: opinion._id }
-    set_online(Volt.user)
   end
   
   def my_conversations
@@ -111,7 +111,9 @@ class MainController < Volt::ModelController
   
   def remove_opinion(opinion)
     set_online(Volt.user)
-    _conversations.delete(_conversations.find_one( opinion_id: opinion._id))
+    _conversations.find( opinion_id: opinion._id).each do |conversation|
+      _conversations.destroy(conversation)
+    end
     _opinions.delete(opinion)
   end
   
