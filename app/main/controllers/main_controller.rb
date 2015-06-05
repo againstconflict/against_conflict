@@ -119,7 +119,7 @@ class MainController < Volt::ModelController
   
   # online user check
   def check_online(user)
-    if user._last_online.to_i > Time.now.to_i - 120
+    if user._last_online.to_i > Time.now.to_i - 720
       return true
     else
       return false
